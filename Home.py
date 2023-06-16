@@ -8,8 +8,14 @@ import json
 import matplotlib.pyplot as plt
 import plotly.express as px
 import streamlit as st 
+import itertools
 import logging # Import the logging library
+import plotly.graph_objects as go
+import ast
+
 #import streamlit.components.v1 as components
+st.set_page_config(page_title="Data Explorer", layout="wide",initial_sidebar_state="collapsed")
+
 
 import logging
 
@@ -28,6 +34,16 @@ logging.basicConfig(
 )
 
 
+st.markdown(f"""
+<div style='text-align: center'>
+<div class="card text-white bg-danger mb-3" >
+  <div class="card-header"> <h2> True-skill calculator </h2></div>    
+    <p class="card-text"></p>
+  </div>
+  </div>
+""", unsafe_allow_html=True)
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +53,7 @@ logger = logging.getLogger(__name__)
 import warnings
 warnings.filterwarnings('ignore', module='numpy')
 warnings.filterwarnings('ignore')
-st.title('s')
+
 
 logger.info('Starting to read CSV files') # Add a logging statement
 # Read the CSV files
@@ -119,12 +135,57 @@ submissions.columns=['Bounty',  'Public Result(s)', 'Overall Avg. Grade', 'Disco
 logger.info('Concatenating the dataframes and filtering for certain Bounty Program Name values')  # Add a logging statement
 combined=pd.concat([overall_submissions_calc,submissions],axis=0,join='outer')
 
+
+processed_data=combined.copy()
+
+ # Add a logging statement
+
+
+
+
+# Function to convert string-represented lists into actual lists
+def parse_lists(val):
+    try:
+        return ast.literal_eval(val)
+    except (ValueError, SyntaxError):
+        return [val]
+# Apply the function to the 'Bounty Program Name' column
+processed_data['Bounty Program Name'] = processed_data['Bounty Program Name'].apply(parse_lists)
+# Flatten the lists in 'Bounty Program Name' column to get a list of all program names
+all_program_names = list(itertools.chain(*processed_data['Bounty Program Name'].tolist()))
+# Get unique program names
+unique_program_names = list(set(all_program_names))
+unique_program_names.append('All')
+
+
+
+c1,c2,c3,c4 = st.columns(4)
+
+name=c1.selectbox('Discord Handle',processed_data['Discord Handle'].unique())
+c1.write('OR')
+address=c1.selectbox('Wallet Address',processed_data['xMetric Wallet'].unique())
+default_value = [unique_program_names[-1]]
+chain = c2.multiselect('Project', unique_program_names, default=default_value)
+
+start_date=c3.date_input('Start Date',datetime.date(2022, 1, 1),min_value=datetime.date(2022, 1, 1))
+last_date=c4.date_input('Last Date')
+st.markdown("---")
+
+
+
 logger.info('Filtering the dataset to include chain/project')  # Add a logging statement
-Bounty_Program_Name=combined['Bounty Program Name'].unique()
-# Bounty_Program_Name=['Flow']
+if chain[0]=='All':
+    Bounty_Program_Name=combined['Bounty Program Name'].unique()
+
+else:
+    try:
+        chain.remove('All')
+    except:
+        pass
+    Bounty_Program_Name=chain
 pattern = '|'.join(Bounty_Program_Name)
 processed_data = combined[combined['Bounty Program Name'].str.contains(pattern, na=False, case=False)]
-processed_data=combined.copy()
+
 
 logger.info('Exclude challenges with less than 2 participants')  # Add a logging statement
 # Get a list of challenge URLs where 'Discord Handle' count is less than 2
@@ -132,7 +193,28 @@ challenge_urls_to_skip = processed_data.groupby(by='Challenge_url').filter(lambd
 
 # Filter the DataFrame to exclude the challenge URLs in the list
 processed_data = processed_data[~processed_data['Challenge_url'].isin(challenge_urls_to_skip)]
-logger.info('Excluded challenges with less than 2 participants,%s',str(challenge_urls_to_skip))  # Add a logging statement
+logger.info('Excluded challenges with less than 2 participants,%s',str(challenge_urls_to_skip)) 
+
+
+logger.info('Using time bounds') 
+st.write(processed_data.head())
+# Convert 'End Date' column to datetime
+processed_data['End Date'] = pd.to_datetime(processed_data['End Date'])
+
+# Convert start_date to pandas.Timestamp
+start_date = pd.Timestamp(start_date)
+last_date = pd.Timestamp(last_date)
+
+# Then you can make the comparison
+processed_data=processed_data[(processed_data['End Date']>=start_date) & (processed_data['End Date']<=last_date)]
+
+
+
+
+
+
+
+
 
 # Initialize a dataframe for ELO score and save it to a CSV file
 logger.info('Initializing a dataframe for ELO score and saving it to a CSV file')  # Add a logging statement
@@ -141,6 +223,7 @@ last_elo_score.to_csv('latest_elo_score.csv')
 
 # Initialize a list for final output 
 data_with_rank=[]
+
 
 # Calculate ELO scores for each unique challenge url
 logger.info('Calculating ELO scores for each unique challenge url')  # Add a logging statement
@@ -396,7 +479,7 @@ Final_data=pd.DataFrame(data_with_rank)
 
 try:
 # Rename the columns of the DataFrame.
-    Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Day', 'Score', 'Variance']
+    Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Score', 'Variance']
 except Exception as e:
     logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
     pass
@@ -406,7 +489,7 @@ logger.debug('Saving DataFrame to CSV file: true_skill_sheet.csv')  # Add a debu
 Final_data.to_csv('true_skill_sheet.csv')
 logger.info('Successfully saved DataFrame to CSV file: true_skill_sheet.csv')  # Add an info statement
 
-latest_score_csv = Final_data.sort_values('Day').groupby('Discord Handle',as_index=False)['Score'].last()
+latest_score_csv = Final_data.sort_values('Date').groupby('Discord Handle',as_index=False)['Score'].last()
 latest_score_csv=pd.DataFrame(latest_score_csv)
 latest_score_csv.columns=['Discord Handle','Score']
 
@@ -414,4 +497,88 @@ logger.debug('Saving DataFrame to CSV file: latest_score.csv')  # Add a debuggin
 latest_score_csv.to_csv('latest_score.csv')
 logger.info('Successfully saved DataFrame to CSV file: latest_score.csv')  # Add an info statement
 
-st.write(latest_score_csv.sort_values(by='Score',ascending=False).head())
+individual_graph=Final_data[Final_data['Discord Handle']==name]
+st.write(individual_graph)
+
+
+c1,c2=st.columns((40,60))
+
+
+
+
+# Convert 'Date' column to datetime if it's not already
+individual_graph['Date'] = pd.to_datetime(individual_graph['Date'])
+
+# Sort data by date
+individual_graph = individual_graph.sort_values(by='Date')
+
+# Set 'Date' as index
+individual_graph.set_index('Date', inplace=True)
+
+# Smooth the 'Score' column with a rolling window operation (mean over window of size N)
+N = 4 # You can change the window size as needed
+individual_graph['Score_smooth'] = individual_graph['Score'].round(0).rolling(window=N).mean()
+
+# Reset the index
+individual_graph.reset_index(inplace=True)
+
+# Now plot the smoothed data
+individual_graph_smooth=px.line(individual_graph, x='Date', y='Score_smooth')
+individual_graph_smooth.update_yaxes(range=[0, 200])
+individual_graph_smooth.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
+individual_graph_smooth.update_layout(
+title="True Skill score of : {}".format(name),
+xaxis_title="Date",
+yaxis_title="Score",
+font=dict(
+    color="White"
+))
+c2.plotly_chart(individual_graph_smooth, use_container_width=True)
+
+
+
+try:
+
+    Latest_score = individual_graph['Score'].iloc[0]
+
+    fig = go.Figure(go.Indicator(
+        mode = "number+delta",
+        value = Latest_score,
+        number = {'prefix': " ", 'font': {'size': 24}},
+        delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
+        domain = {'x': [0, 1], 'y': [0, 1]}))
+
+
+    fig.update_layout({
+        # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
+        # 'paper_bgcolor': 'rgba(215,215,215,255)',
+        'height': 200, 
+        'width': 600,
+        'font': { 'size': 28}  
+    })
+
+    c1.plotly_chart(fig, use_container_width=True)
+
+
+except :
+    Latest_score = individual_graph['Score'].iloc[0]
+
+    fig = go.Figure(go.Indicator(
+        mode = "number",
+        value = Latest_score,
+        number = {'prefix': " ", 'font': {'size': 24}},
+        # delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
+        domain = {'x': [0, 1], 'y': [0, 1]}))
+
+
+    fig.update_layout({
+        # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
+        # 'paper_bgcolor': 'rgba(215,215,215,255)',
+        'height': 200, 
+        'width': 600,
+        'font': { 'size': 28}  
+    })
+
+    c1.plotly_chart(fig, use_container_width=True)
+
+
