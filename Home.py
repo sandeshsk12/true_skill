@@ -19,7 +19,13 @@ if not os.path.exists('logs'):
     os.makedirs('logs')
 
 # Configure the logging module.
-logging.basicConfig(filename='logs/app.log', level=logging.INFO)
+logging.basicConfig(
+    filename='logs/app.log',
+    filemode='w',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 
 
@@ -126,6 +132,7 @@ challenge_urls_to_skip = processed_data.groupby(by='Challenge_url').filter(lambd
 
 # Filter the DataFrame to exclude the challenge URLs in the list
 processed_data = processed_data[~processed_data['Challenge_url'].isin(challenge_urls_to_skip)]
+logger.info('Excluded challenges with less than 2 participants,%s',str(challenge_urls_to_skip))  # Add a logging statement
 
 # Initialize a dataframe for ELO score and save it to a CSV file
 logger.info('Initializing a dataframe for ELO score and saving it to a CSV file')  # Add a logging statement
@@ -378,7 +385,7 @@ for bounty in processed_data['Challenge_url'].unique():
             data_with_rank.append(record_details)
 
         # Save the 'latest_elo_score' DataFrame to a CSV file
-    logger.debug('Successfully processed record details')  # Add a debugging statement
+    logger.debug('Successfully processed record details of challenge %s',bounty)  # Add a debugging statement
     latest_elo_score.to_csv('latest_elo_score.csv')
     logger.info('Successfully saved latest_elo_score.csv')  # Add an info statement
     
