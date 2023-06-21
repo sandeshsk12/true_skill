@@ -12,9 +12,11 @@ import itertools
 import logging # Import the logging library
 import plotly.graph_objects as go
 import ast
+from dateutil.relativedelta import relativedelta
 
 #import streamlit.components.v1 as components
 st.set_page_config(page_title="Data Explorer", layout="wide",initial_sidebar_state="collapsed")
+st.markdown('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">',unsafe_allow_html=True)
 
 
 import logging
@@ -158,427 +160,593 @@ unique_program_names = list(set(all_program_names))
 unique_program_names.append('All')
 
 
+analyst_profile,leader_board=st.tabs(['Analyst Profile','LeaderBoard'])
 
-c1,c2,c3,c4 = st.columns(4)
+with analyst_profile: 
+    c1,c2,c3,c4 = st.columns(4)
 
-name=c1.selectbox('Discord Handle',processed_data['Discord Handle'].unique())
-c1.write('OR')
-address=c1.selectbox('Wallet Address',processed_data['xMetric Wallet'].unique())
-default_value = [unique_program_names[-1]]
-chain = c2.multiselect('Project', unique_program_names, default=default_value)
-
-start_date=c3.date_input('Start Date',datetime.date(2022, 1, 1),min_value=datetime.date(2022, 1, 1))
-last_date=c4.date_input('Last Date')
-st.markdown("---")
-
-
-
-logger.info('Filtering the dataset to include chain/project')  # Add a logging statement
-if chain[0]=='All':
-    Bounty_Program_Name=combined['Bounty Program Name'].unique()
-
-else:
-    try:
-        chain.remove('All')
-    except:
-        pass
-    Bounty_Program_Name=chain
-pattern = '|'.join(Bounty_Program_Name)
-processed_data = combined[combined['Bounty Program Name'].str.contains(pattern, na=False, case=False)]
-
-
-logger.info('Exclude challenges with less than 2 participants')  # Add a logging statement
-# Get a list of challenge URLs where 'Discord Handle' count is less than 2
-challenge_urls_to_skip = processed_data.groupby(by='Challenge_url').filter(lambda x: x['Discord Handle'].nunique() < 2)['Challenge_url'].unique().tolist()
-
-# Filter the DataFrame to exclude the challenge URLs in the list
-processed_data = processed_data[~processed_data['Challenge_url'].isin(challenge_urls_to_skip)]
-logger.info('Excluded challenges with less than 2 participants,%s',str(challenge_urls_to_skip)) 
-
-
-logger.info('Using time bounds') 
-st.write(processed_data.head())
-# Convert 'End Date' column to datetime
-processed_data['End Date'] = pd.to_datetime(processed_data['End Date'])
-
-# Convert start_date to pandas.Timestamp
-start_date = pd.Timestamp(start_date)
-last_date = pd.Timestamp(last_date)
-
-# Then you can make the comparison
-processed_data=processed_data[(processed_data['End Date']>=start_date) & (processed_data['End Date']<=last_date)]
+    name=c1.selectbox('Discord Handle',processed_data['Discord Handle'].unique())
+    c1.write('OR')
+    address=c1.selectbox('Wallet Address',processed_data['xMetric Wallet'].unique())
+    default_value = [unique_program_names[-1]]
+    chain = c2.multiselect('Project', unique_program_names, default=default_value)
 
 
 
 
+    start_date=c3.date_input('Start Date',datetime.date(2022, 1, 1),min_value=datetime.date(2022, 1, 1))
+    last_date=c4.date_input('Last Date')
+
+    number_of_months=c3.select_slider("Number of Previous Months", options=[0,1,3,6,12,24])
+    c4.write('You selected {} Months'.format(number_of_months))
+
+
+    include_notion=c2.checkbox('Include notion',value=True)
+
+    if number_of_months > 0:
+        start_date= last_date-relativedelta(months=number_of_months)
 
 
 
 
-
-# Initialize a dataframe for ELO score and save it to a CSV file
-logger.info('Initializing a dataframe for ELO score and saving it to a CSV file')  # Add a logging statement
-last_elo_score = pd.DataFrame(columns=['Discord Handle', 'mean', 'variance'])
-last_elo_score.to_csv('latest_elo_score.csv')
-
-# Initialize a list for final output 
-data_with_rank=[]
+    st.markdown("---")
 
 
-# Calculate ELO scores for each unique challenge url
-logger.info('Calculating ELO scores for each unique challenge url')  # Add a logging statement
-for bounty in processed_data['Challenge_url'].unique():
-        # Remainder of the code includes calculations for ELO score
-        # Filter for unique challenge url
-    logger.debug('Processing challenge: %s', bounty)  # Add a debugging statement
-    record_details=[]
-    
-    challenge_df=processed_data[processed_data['Challenge_url']==bounty]
-#     temp=temp[temp['Bounty Program Name']==Bounty_Program_Name]
-    challenge_df=challenge_df.sort_values(by='Overall Avg. Grade',ascending=False)
-    challenge_df['Rank']=challenge_df['Overall Avg. Grade'].rank(ascending=False,method='min')
-    challenge_df=challenge_df[['Bounty',  'Public Result(s)', 'Overall Avg. Grade', 'Discord Handle','Rank','End Date','Bounty Program Name','xMetric Wallet','Challenge_url']]
-    End_Date=challenge_df['End Date'].iloc[0]
-    latest_elo_score=pd.read_csv('latest_elo_score.csv')
-    elo_score={}
-    latest_elo_score=latest_elo_score[['Discord Handle','mean','variance']]
 
 
-    # Checking if challenge_url is same as bounty name, if it is, then it means it's a challenge launched on notion
-    if challenge_df['Challenge_url'].iloc[0]==challenge_df['Bounty'].iloc[0]:
+    logger.info('Filtering the dataset to include chain/project')  # Add a logging statement
+    if chain[0]=='All':
+        Bounty_Program_Name=combined['Bounty Program Name'].unique()
 
-        # continue
-        
-        
-        challenge_df=challenge_df.drop_duplicates(subset=['Discord Handle'],keep='first')
-
-
-        # Iterate over each 'Discord Handle' in the challenge data.
-        for handle in (challenge_df['Discord Handle']):
-
-            # If the handle is present in the latest ELO score dataframe, then set the
-            # ELO score of the handle as the 'mean' ELO score from the latest ELO score dataframe.
-            if handle in latest_elo_score['Discord Handle'].values:
-                elo_score[handle]=Rating(latest_elo_score[latest_elo_score['Discord Handle']==handle]['mean'].values[0]) 
-
-            # If the handle is not present in the latest ELO score dataframe, then set the
-            # ELO score of the handle as 100. This can be considered as the default or starting ELO score.
-            else:
-                elo_score[handle]=Rating(100)
-
-        # Create an empty list to hold tuples of Rating objects. This is because the 'rate' function 
-        # from the TrueSkill package expects a sequence of Rating objects.
-        rating_tuple = []
-
-        # Iterate over each ELO score in the elo_score dictionary.
-        for elo_object_of_handle in elo_score:
-            # Create a new Rating object for the ELO score and append it as a single-item tuple to the 'rating_tuple' list.
-            # setup(backend='mpmath')
-            rating = Rating(elo_score[elo_object_of_handle])
-            rating_tuple.append((rating,))
-
-        # Try to calculate new ELO ratings using the 'rate' function from the TrueSkill package. 
-        # The 'rate' function takes in a sequence of Rating objects and a sequence of ranks as arguments.
-        try:
-            new_ratings = rate(rating_tuple, ranks=challenge_df.Rank)
-            
-        # If there is an error while calculating the new ELO ratings, catch the exception and print out the details.
-        except Exception as e:
-            logger.error('Error calculating new ratings for challenge: %s. Error: %s', bounty, e)  # Add an error statement
-            continue
-
-        # Set a counter to 0. This counter is used to index the new ratings.
-        j=0
-
-        # Iterate over each key (which is a 'Discord Handle') in the 'elo_score' dictionary.
-        for i in elo_score.keys():
-            # Create an empty list to hold the details of each record.
-            record_details=[]
-
-            try:
-                # If the 'Discord Handle' is not present in the 'latest_elo_score' dataframe,
-                # add a new row to the dataframe with the handle and its new ELO rating.
-                # Also append the details to the 'record_details' list.
-                if i not in latest_elo_score['Discord Handle'].values:
-                    new_row = {'Discord Handle':i, 'mean':new_ratings[j][0].mu,'variance':new_ratings[j][0].sigma}
-                    new_row_df = pd.DataFrame(new_row, index=[0])  # Convert the dictionary to a DataFrame
-                    latest_elo_score = pd.concat([latest_elo_score,new_row_df], ignore_index=True)  # Append the new DataFrame to the existing one
-                    # ... (details being added to record_details)
-                    record_details.append(i)
-                    record_details.append(challenge_df['xMetric Wallet'].iloc[j])
-                    record_details.append(challenge_df['Public Result(s)'].iloc[j])
-                    record_details.append(challenge_df['Bounty Program Name'].iloc[j])
-                    record_details.append(bounty)
-                    record_details.append('-')
-                    record_details.append(End_Date)
-                    record_details.append(new_ratings[j][0].mu)
-                    record_details.append(new_ratings[j][0].sigma)
-                    j=j+1
-                # If the 'Discord Handle' is present in the 'latest_elo_score' dataframe,
-                # update its ELO rating in the dataframe. Also append the details to the 'record_details' list.
-                else:
-                    latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'mean'] = new_ratings[j][0].mu
-                    latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'variance'] = new_ratings[j][0].sigma
-
-                    # ... (details being added to record_details)
-                    record_details.append(i)
-                    record_details.append(challenge_df['xMetric Wallet'].iloc[j])
-                    record_details.append(challenge_df['Public Result(s)'].iloc[j])
-                    record_details.append(challenge_df['Bounty Program Name'].iloc[j])
-                    record_details.append(bounty)
-                    record_details.append('-') 
-                    record_details.append(End_Date)
-                    record_details.append(new_ratings[j][0].mu)
-                    record_details.append(new_ratings[j][0].sigma)
-                    j=j+1
-
-            # If there is an error while updating the ELO ratings or appending the details, catch the exception and print out the details.
-            except Exception as e:
-                logger.error('Error %s in updating elo_score for challenge: %s', e, bounty)  # Add an error statement
-                    
-                j=j+1
-
-            # Append the record details to the 'data_with_rank' list. 
-            # This list will later be used to create a dataframe with all the details.
-            data_with_rank.append(record_details)
-        logger.debug('Successfully processed challenge: %s', bounty)  # Add a debugging statement
-
-        # Save the 'latest_elo_score' dataframe to a CSV file.
-        # latest_elo_score.to_csv('latest_elo_score.csv')
-
-        
     else:
-
-        # continue
-        logger.debug('Iterating over xMetric Wallet values in challenge_df')  # Add a debugging statement
-
-        # Iterate over each value in the 'xMetric Wallet' column of the 'challenge_df' DataFrame.
-        for i in (challenge_df['xMetric Wallet']):
-
-            # If the current value is in the 'Discord Handle' column of the 'latest_elo_score' DataFrame,
-            # assign a new rating to the 'elo_score' dictionary for that value.
-            # The new rating is based on the 'mean' column of the 'latest_elo_score' DataFrame for the corresponding 'Discord Handle'.
-            if i in latest_elo_score['Discord Handle'].values:
-                elo_score[i]=Rating(latest_elo_score[latest_elo_score['Discord Handle']==i]['mean'].values[0])
-
-
-            # If the current value is not in the 'Discord Handle' column of the 'latest_elo_score' DataFrame,
-            # assign a new rating of 100 to the 'elo_score' dictionary for that value.
-            else:
-                elo_score[i]=Rating(100)
-
-
-
-        # Initialize an empty list 'rating_tuple'
-        rating_tuple = []
-
-        # Iterate over each item in the 'elo_score' dictionary
-        for j in elo_score:
-            
-            # For each item in the dictionary, create a Rating object using its value
-            rating = Rating(elo_score[j])
-
-            # Add the Rating object to the 'rating_tuple' list as a single-item tuple
-            rating_tuple.append((rating,))
-
-
-        # Attempt to calculate new ratings based on the 'rating_tuple' list and ranks from the 'challenge_df' DataFrame
         try:
-            new_ratings = rate(rating_tuple, ranks=challenge_df.Rank)
+            chain.remove('All')
+        except:
+            pass
+        Bounty_Program_Name=chain
+    pattern = '|'.join(Bounty_Program_Name)
+    processed_data = combined[combined['Bounty Program Name'].str.contains(pattern, na=False, case=False)]
 
 
-        # If an exception occurs during the rating calculation,
-        except Exception as e:
-            logger.error('Error calculating new ratings. Error: %s', e)  # Add an error statement
+    logger.info('Exclude challenges with less than 2 participants')  # Add a logging statement
+    # Get a list of challenge URLs where 'Discord Handle' count is less than 2
+    challenge_urls_to_skip = processed_data.groupby(by='Challenge_url').filter(lambda x: x['Discord Handle'].nunique() < 2)['Challenge_url'].unique().tolist()
 
-            # Print the exception message
-            # print(e)
-
-            continue
-
-
-        # Initialize a counter 'j' to 0
-        j=0
-
-        # Iterate over keys in the 'elo_score' dictionary
-        for i in elo_score.keys():
-            
-            # Initialize an empty list 'record_details'
-            record_details=[]
+    # Filter the DataFrame to exclude the challenge URLs in the list
+    processed_data = processed_data[~processed_data['Challenge_url'].isin(challenge_urls_to_skip)]
+    logger.info('Excluded challenges with less than 2 participants,%s',str(challenge_urls_to_skip)) 
 
 
-            try:
-                # Check if current key is not in the 'Discord Handle' column of the 'latest_elo_score' DataFrame
+    logger.info('Using time bounds') 
+    st.write(processed_data.head())
+    # Convert 'End Date' column to datetime
+    processed_data['End Date'] = pd.to_datetime(processed_data['End Date'])
 
-                if i not in latest_elo_score['Discord Handle'].values:
+    # Convert start_date to pandas.Timestamp
+    start_date = pd.Timestamp(start_date)
+    last_date = pd.Timestamp(last_date)
 
-                    
-                    # If not, create a new row with 'Discord Handle', 'mean' and 'variance' columns
-                    new_row = {'Discord Handle':i, 'mean':new_ratings[j][0].mu,'variance':new_ratings[j][0].sigma}
-
-                    # Append the new row to the 'latest_elo_score' DataFrame
-                    new_row_df = pd.DataFrame(new_row, index=[0])  # Convert the dictionary to a DataFrame
-                    latest_elo_score = pd.concat([latest_elo_score,new_row_df], ignore_index=True)  # Append the new DataFrame to the existing one
-
-
-                    # Append relevant details to the 'record_details' list
-                    # Append relevant details to the 'record_details' list
-                    record_details.append(challenge_df['Discord Handle'].iloc[j])
-                    record_details.append(i)
-                    record_details.append(challenge_df.iloc[j]['Public Result(s)'])
-                    record_details.append(challenge_df.iloc[j]['Bounty Program Name'])
-                    record_details.append(challenge_df.iloc[j]['Bounty'])
-                    record_details.append(challenge_df.iloc[j]['Challenge_url'])
-                    record_details.append(challenge_df.iloc[j]['End Date'])
-                    record_details.append(new_ratings[j][0].mu)
-                    record_details.append(new_ratings[j][0].sigma)
-                    j=j+1
-
-                
-                else:
-                    # If current key is in the 'Discord Handle' column of the 'latest_elo_score' DataFrame,
-                    # update the 'mean' and 'variance' of the corresponding row with the new ratings
-                    latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'mean'] = new_ratings[j][0].mu
-                    latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'variance'] = new_ratings[j][0].sigma
-
-                    # Append relevant details to the 'record_details' list
-                    # Append relevant details to the 'record_details' list
-                    record_details.append(challenge_df['Discord Handle'].iloc[j])
-                    record_details.append(i)
-                    record_details.append(challenge_df.iloc[j]['Public Result(s)'])
-                    record_details.append(challenge_df.iloc[j]['Bounty Program Name'])
-                    record_details.append(challenge_df.iloc[j]['Bounty'])
-                    record_details.append(challenge_df.iloc[j]['Challenge_url'])
-                    record_details.append(challenge_df.iloc[j]['End Date'])
-                    record_details.append(new_ratings[j][0].mu)
-                    record_details.append(new_ratings[j][0].sigma)
-                    j=j+1
+    # Then you can make the comparison
+    processed_data=processed_data[(processed_data['End Date']>=start_date) & (processed_data['End Date']<=last_date)]
 
 
 
-            # Catch any exceptions that occur in the try block
-            except Exception as e:
-                # Print the exception message along with a custom message and the challenge URL
-                logger.error('Error processing record details. Error: %s', e)  # Add an error statement
 
-                # Skip the current iteration and continue with the next one
+
+
+
+
+
+    # Initialize a dataframe for ELO score and save it to a CSV file
+    logger.info('Initializing a dataframe for ELO score and saving it to a CSV file')  # Add a logging statement
+    last_elo_score = pd.DataFrame(columns=['Discord Handle', 'mean', 'variance'])
+    last_elo_score.to_csv('latest_elo_score.csv')
+
+    # Initialize a list for final output 
+    data_with_rank=[]
+
+
+    # Calculate ELO scores for each unique challenge url
+    logger.info('Calculating ELO scores for each unique challenge url')  # Add a logging statement
+    for bounty in processed_data['Challenge_url'].unique():
+            # Remainder of the code includes calculations for ELO score
+            # Filter for unique challenge url
+        logger.debug('Processing challenge: %s', bounty)  # Add a debugging statement
+        record_details=[]
+        
+        challenge_df=processed_data[processed_data['Challenge_url']==bounty]
+    #     temp=temp[temp['Bounty Program Name']==Bounty_Program_Name]
+        challenge_df=challenge_df.sort_values(by='Overall Avg. Grade',ascending=False)
+        challenge_df['Rank']=challenge_df['Overall Avg. Grade'].rank(ascending=False,method='min')
+        challenge_df=challenge_df[['Bounty',  'Public Result(s)', 'Overall Avg. Grade', 'Discord Handle','Rank','End Date','Bounty Program Name','xMetric Wallet','Challenge_url']]
+        End_Date=challenge_df['End Date'].iloc[0]
+        latest_elo_score=pd.read_csv('latest_elo_score.csv')
+        elo_score={}
+        latest_elo_score=latest_elo_score[['Discord Handle','mean','variance']]
+
+
+        # Checking if challenge_url is same as bounty name, if it is, then it means it's a challenge launched on notion
+        if challenge_df['Challenge_url'].iloc[0]==challenge_df['Bounty'].iloc[0]:
+            if include_notion==False:
                 continue
 
-            # If no exceptions occur, append the 'record_details' list to the 'data_with_rank' list
-            data_with_rank.append(record_details)
+            # continue
+            
+            
+            challenge_df=challenge_df.drop_duplicates(subset=['Discord Handle'],keep='first')
 
-        # Save the 'latest_elo_score' DataFrame to a CSV file
-    logger.debug('Successfully processed record details of challenge %s',bounty)  # Add a debugging statement
-    latest_elo_score.to_csv('latest_elo_score.csv')
-    logger.info('Successfully saved latest_elo_score.csv')  # Add an info statement
+
+            # Iterate over each 'Discord Handle' in the challenge data.
+            for handle in (challenge_df['Discord Handle']):
+
+                # If the handle is present in the latest ELO score dataframe, then set the
+                # ELO score of the handle as the 'mean' ELO score from the latest ELO score dataframe.
+                if handle in latest_elo_score['Discord Handle'].values:
+                    elo_score[handle]=Rating(latest_elo_score[latest_elo_score['Discord Handle']==handle]['mean'].values[0]) 
+
+                # If the handle is not present in the latest ELO score dataframe, then set the
+                # ELO score of the handle as 100. This can be considered as the default or starting ELO score.
+                else:
+                    elo_score[handle]=Rating(100)
+
+            # Create an empty list to hold tuples of Rating objects. This is because the 'rate' function 
+            # from the TrueSkill package expects a sequence of Rating objects.
+            rating_tuple = []
+
+            # Iterate over each ELO score in the elo_score dictionary.
+            for elo_object_of_handle in elo_score:
+                # Create a new Rating object for the ELO score and append it as a single-item tuple to the 'rating_tuple' list.
+                # setup(backend='mpmath')
+                rating = Rating(elo_score[elo_object_of_handle])
+                rating_tuple.append((rating,))
+
+            # Try to calculate new ELO ratings using the 'rate' function from the TrueSkill package. 
+            # The 'rate' function takes in a sequence of Rating objects and a sequence of ranks as arguments.
+            try:
+                new_ratings = rate(rating_tuple, ranks=challenge_df.Rank)
+                
+            # If there is an error while calculating the new ELO ratings, catch the exception and print out the details.
+            except Exception as e:
+                logger.error('Error calculating new ratings for challenge: %s. Error: %s', bounty, e)  # Add an error statement
+                continue
+
+            # Set a counter to 0. This counter is used to index the new ratings.
+            j=0
+
+            # Iterate over each key (which is a 'Discord Handle') in the 'elo_score' dictionary.
+            for i in elo_score.keys():
+                # Create an empty list to hold the details of each record.
+                record_details=[]
+
+                try:
+                    # If the 'Discord Handle' is not present in the 'latest_elo_score' dataframe,
+                    # add a new row to the dataframe with the handle and its new ELO rating.
+                    # Also append the details to the 'record_details' list.
+                    if i not in latest_elo_score['Discord Handle'].values:
+                        new_row = {'Discord Handle':i, 'mean':new_ratings[j][0].mu,'variance':new_ratings[j][0].sigma}
+                        new_row_df = pd.DataFrame(new_row, index=[0])  # Convert the dictionary to a DataFrame
+                        latest_elo_score = pd.concat([latest_elo_score,new_row_df], ignore_index=True)  # Append the new DataFrame to the existing one
+                        # ... (details being added to record_details)
+                        record_details.append(i)
+                        record_details.append(challenge_df['xMetric Wallet'].iloc[j])
+                        record_details.append(challenge_df['Public Result(s)'].iloc[j])
+                        record_details.append(challenge_df['Bounty Program Name'].iloc[j])
+                        record_details.append(bounty)
+                        record_details.append('-')
+                        record_details.append(End_Date)
+                        record_details.append(challenge_df.iloc[j]['Rank'])
+                        record_details.append(processed_data[processed_data['Bounty']==challenge_df.iloc[j]['Bounty']].shape[0])
+                        record_details.append(new_ratings[j][0].mu)
+                        record_details.append(new_ratings[j][0].sigma)
+                        
+                        j=j+1
+                    # If the 'Discord Handle' is present in the 'latest_elo_score' dataframe,
+                    # update its ELO rating in the dataframe. Also append the details to the 'record_details' list.
+                    else:
+                        latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'mean'] = new_ratings[j][0].mu
+                        latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'variance'] = new_ratings[j][0].sigma
+
+                        # ... (details being added to record_details)
+                        record_details.append(i)
+                        record_details.append(challenge_df['xMetric Wallet'].iloc[j])
+                        record_details.append(challenge_df['Public Result(s)'].iloc[j])
+                        record_details.append(challenge_df['Bounty Program Name'].iloc[j])
+                        record_details.append(bounty)
+                        record_details.append('-') 
+                        record_details.append(End_Date)
+                        record_details.append(challenge_df.iloc[j]['Rank'])
+                        record_details.append(processed_data[processed_data['Bounty']==challenge_df.iloc[j]['Bounty']].shape[0])
+                        record_details.append(new_ratings[j][0].mu)
+                        record_details.append(new_ratings[j][0].sigma)
+                        j=j+1
+
+                # If there is an error while updating the ELO ratings or appending the details, catch the exception and print out the details.
+                except Exception as e:
+                    logger.error('Error %s in updating elo_score for challenge: %s', e, bounty)  # Add an error statement
+                        
+                    j=j+1
+
+                # Append the record details to the 'data_with_rank' list. 
+                # This list will later be used to create a dataframe with all the details.
+                data_with_rank.append(record_details)
+            logger.debug('Successfully processed challenge: %s', bounty)  # Add a debugging statement
+
+            # Save the 'latest_elo_score' dataframe to a CSV file.
+            # latest_elo_score.to_csv('latest_elo_score.csv')
+
+            
+        else:
+
+            # continue
+            logger.debug('Iterating over xMetric Wallet values in challenge_df')  # Add a debugging statement
+
+            # Iterate over each value in the 'xMetric Wallet' column of the 'challenge_df' DataFrame.
+            for i in (challenge_df['xMetric Wallet']):
+
+                # If the current value is in the 'Discord Handle' column of the 'latest_elo_score' DataFrame,
+                # assign a new rating to the 'elo_score' dictionary for that value.
+                # The new rating is based on the 'mean' column of the 'latest_elo_score' DataFrame for the corresponding 'Discord Handle'.
+                if i in latest_elo_score['Discord Handle'].values:
+                    elo_score[i]=Rating(latest_elo_score[latest_elo_score['Discord Handle']==i]['mean'].values[0])
+
+
+                # If the current value is not in the 'Discord Handle' column of the 'latest_elo_score' DataFrame,
+                # assign a new rating of 100 to the 'elo_score' dictionary for that value.
+                else:
+                    elo_score[i]=Rating(100)
+
+
+
+            # Initialize an empty list 'rating_tuple'
+            rating_tuple = []
+
+            # Iterate over each item in the 'elo_score' dictionary
+            for j in elo_score:
+                
+                # For each item in the dictionary, create a Rating object using its value
+                rating = Rating(elo_score[j])
+
+                # Add the Rating object to the 'rating_tuple' list as a single-item tuple
+                rating_tuple.append((rating,))
+
+
+            # Attempt to calculate new ratings based on the 'rating_tuple' list and ranks from the 'challenge_df' DataFrame
+            try:
+                new_ratings = rate(rating_tuple, ranks=challenge_df.Rank)
+
+
+            # If an exception occurs during the rating calculation,
+            except Exception as e:
+                logger.error('Error calculating new ratings. Error: %s', e)  # Add an error statement
+
+                # Print the exception message
+                # print(e)
+
+                continue
+
+
+            # Initialize a counter 'j' to 0
+            j=0
+
+            # Iterate over keys in the 'elo_score' dictionary
+            for i in elo_score.keys():
+                
+                # Initialize an empty list 'record_details'
+                record_details=[]
+
+
+                try:
+                    # Check if current key is not in the 'Discord Handle' column of the 'latest_elo_score' DataFrame
+
+                    if i not in latest_elo_score['Discord Handle'].values:
+
+                        
+                        # If not, create a new row with 'Discord Handle', 'mean' and 'variance' columns
+                        new_row = {'Discord Handle':i, 'mean':new_ratings[j][0].mu,'variance':new_ratings[j][0].sigma}
+
+                        # Append the new row to the 'latest_elo_score' DataFrame
+                        new_row_df = pd.DataFrame(new_row, index=[0])  # Convert the dictionary to a DataFrame
+                        latest_elo_score = pd.concat([latest_elo_score,new_row_df], ignore_index=True)  # Append the new DataFrame to the existing one
+
+
+                        # Append relevant details to the 'record_details' list
+                        # Append relevant details to the 'record_details' list
+                        record_details.append(challenge_df['Discord Handle'].iloc[j])
+                        record_details.append(i)
+                        record_details.append(challenge_df.iloc[j]['Public Result(s)'])
+                        record_details.append(challenge_df.iloc[j]['Bounty Program Name'])
+                        record_details.append(challenge_df.iloc[j]['Bounty'])
+                        record_details.append(challenge_df.iloc[j]['Challenge_url'])
+                        record_details.append(challenge_df.iloc[j]['End Date'])
+                        record_details.append(challenge_df.iloc[j]['Rank'])
+                        record_details.append(processed_data[processed_data['Bounty']==challenge_df.iloc[j]['Bounty']].shape[0])
+                        record_details.append(new_ratings[j][0].mu)
+                        record_details.append(new_ratings[j][0].sigma)
+                        j=j+1
+
+                    
+                    else:
+                        # If current key is in the 'Discord Handle' column of the 'latest_elo_score' DataFrame,
+                        # update the 'mean' and 'variance' of the corresponding row with the new ratings
+                        latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'mean'] = new_ratings[j][0].mu
+                        latest_elo_score.loc[latest_elo_score['Discord Handle'] == i, 'variance'] = new_ratings[j][0].sigma
+
+                        # Append relevant details to the 'record_details' list
+                        # Append relevant details to the 'record_details' list
+                        record_details.append(challenge_df['Discord Handle'].iloc[j])
+                        record_details.append(i)
+                        record_details.append(challenge_df.iloc[j]['Public Result(s)'])
+                        record_details.append(challenge_df.iloc[j]['Bounty Program Name'])
+                        record_details.append(challenge_df.iloc[j]['Bounty'])
+                        record_details.append(challenge_df.iloc[j]['Challenge_url'])
+                        record_details.append(challenge_df.iloc[j]['End Date'])
+                        record_details.append(challenge_df.iloc[j]['Rank'])
+                        record_details.append(processed_data[processed_data['Bounty']==challenge_df.iloc[j]['Bounty']].shape[0])
+                        record_details.append(new_ratings[j][0].mu)
+                        record_details.append(new_ratings[j][0].sigma)
+                        j=j+1
+
+
+
+                # Catch any exceptions that occur in the try block
+                except Exception as e:
+                    # Print the exception message along with a custom message and the challenge URL
+                    logger.error('Error processing record details. Error: %s', e)  # Add an error statement
+
+                    # Skip the current iteration and continue with the next one
+                    continue
+
+                # If no exceptions occur, append the 'record_details' list to the 'data_with_rank' list
+                data_with_rank.append(record_details)
+
+            # Save the 'latest_elo_score' DataFrame to a CSV file
+        logger.debug('Successfully processed record details of challenge %s',bounty)  # Add a debugging statement
+        latest_elo_score.to_csv('latest_elo_score.csv')
+        logger.info('Successfully saved latest_elo_score.csv')  # Add an info statement
+        
+
+    logger.debug('Converting data_with_rank list into DataFrame')  # Add a debugging statement
+    # Convert the 'data_with_rank' list into a pandas DataFrame.
+    Final_data=pd.DataFrame(data_with_rank)
+
+    try:
+    # Rename the columns of the DataFrame.
+        Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Rank','Number of Submissions','Score', 'Variance']
+    except Exception as e:
+        logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
+        pass
+
+    # Save the DataFrame to a CSV file.
+    logger.debug('Saving DataFrame to CSV file: true_skill_sheet.csv')  # Add a debugging statement
+    Final_data.to_csv('true_skill_sheet.csv')
+    logger.info('Successfully saved DataFrame to CSV file: true_skill_sheet.csv')  # Add an info statement
+
+    latest_score_csv = Final_data.sort_values('Date').groupby('Discord Handle',as_index=False)['Score'].last()
+    latest_score_csv=pd.DataFrame(latest_score_csv)
+    latest_score_csv.columns=['Discord Handle','Score']
+
+    logger.debug('Saving DataFrame to CSV file: latest_score.csv')  # Add a debugging statement
+    latest_score_csv.to_csv('latest_score.csv')
+    logger.info('Successfully saved DataFrame to CSV file: latest_score.csv')  # Add an info statement
+
+    individual_graph=Final_data[Final_data['Discord Handle']==name]
+
+
+
+    c1,c2=st.columns((40,60))
+
+
+
+
+    # Convert 'Date' column to datetime if it's not already
+    individual_graph['Date'] = pd.to_datetime(individual_graph['Date'])
+
+    # Sort data by date
+    individual_graph = individual_graph.sort_values(by='Date')
+
+    # Set 'Date' as index
+    individual_graph.set_index('Date', inplace=True)
+
+    # Smooth the 'Score' column with a rolling window operation (mean over window of size N)
+    N = 4 # You can change the window size as needed
+    individual_graph['Score_smooth'] = individual_graph['Score'].round(0).rolling(window=N).mean()
+
+    # Reset the index
+    individual_graph.reset_index(inplace=True)
+
+
+    if individual_graph.shape[0]==0:
+        c2.markdown( 
+                """
+                <div class="card text-white bg-secondary mb-" style="margin:1rem;" >
+                <div class="card-header"></div>
+                <div class="card-body">
+                <h3 class="card-title">NO SCORE</h3>
+                <p class="card-text">   
+                """, unsafe_allow_html=True
+                )
+    else:
+        fig = go.Figure(go.Indicator(   
+            mode = "number",
+            value = individual_graph.shape[0],
+            number = {'prefix': " ", 'font': {'size': 80}},
+            # delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
+            title = {"text": "<b>Number of dashboards</b>", 'font': {'size': 30}},
+            
+            domain = {'x': [0, 1], 'y': [0, 1]}))
+
+
+        fig.update_layout({
+            # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
+            # 'paper_bgcolor': 'rgba(215,215,215,255)',
+            'height': 200, 
+            'width': 400,
+            'font': { 'size': 28}  
+        })
+
+        c1.plotly_chart(fig, use_container_width=True)
+
+
+        # Now plot the smoothed data
+        individual_graph_smooth=px.line(individual_graph, x='Date', y='Score_smooth')
+        individual_graph_smooth.update_yaxes(range=[Final_data['Score'].min(), Final_data['Score'].max()])
+        individual_graph_smooth.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
+        individual_graph_smooth.update_layout(
+        title="True Skill of : {}".format(name),
+        xaxis_title="Date",
+        yaxis_title="Score",
+        font=dict(
+            color="White"
+        ))
+        c2.plotly_chart(individual_graph_smooth, use_container_width=True)
+
+        
+
+
+
+    try:
+
+        Latest_score = individual_graph['Score'].iloc[0]
+
+        fig = go.Figure(go.Indicator(   
+            mode = "number+delta",
+            value = Latest_score,
+            number = {'prefix': " ", 'font': {'size': 80}},
+            delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
+            title = {"text": "<b>Current True skill</b>", 'font': {'size': 30}},
+            
+            domain = {'x': [0, 1], 'y': [0, 1]}))
+
+
+        fig.update_layout({
+            # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
+            # 'paper_bgcolor': 'rgba(215,215,215,255)',
+            'height': 200, 
+            'width': 400,
+            'font': { 'size': 28}  
+        })
+
+        c1.plotly_chart(fig, use_container_width=True)
+
+
+    except :
+        try: 
+            Latest_score = individual_graph['Score'].iloc[0]
+
+            fig = go.Figure(go.Indicator(
+                mode = "number",
+                value = Latest_score,
+                number = {'prefix': " ", 'font': {'size': 80}},
+                # delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
+                title = {"text": "<b>Current True skill</b>", 'font': {'size': 30}},
+                domain = {'x': [0, 1], 'y': [0, 1]}))
+
+
+            fig.update_layout({
+                # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
+                # 'paper_bgcolor': 'rgba(215,215,215,255)',
+                'height': 200, 
+                'width': 400,
+                'font': { 'size': 28}  
+            })
+
+            c1.plotly_chart(fig, use_container_width=True)
+        except:
+            c1.markdown( 
+                """
+                <div class="card text-white bg-secondary mb-" style="margin:1rem;" >
+                <div class="card-header"></div>
+                <div class="card-body">
+                <h3 class="card-title">NO SCORE</h3>
+                <p class="card-text">   
+                """, unsafe_allow_html=True
+                )
+            
+    c1,c2=st.columns((40,60))
+
+    if individual_graph.shape[0]==0:
+        c2.markdown( 
+                """
+                <div class="card text-white bg-secondary mb-" style="margin:1rem;" >
+                <div class="card-header"></div>
+                <div class="card-body">
+                <h3 class="card-title">NO SCORE</h3>
+                <p class="card-text">   
+                """, unsafe_allow_html=True
+                )
+        c1.markdown( 
+                """
+                <div class="card text-white bg-secondary mb-" style="margin:1rem;" >
+                <div class="card-header"></div>
+                <div class="card-body">
+                <h3 class="card-title">NO SCORE</h3>
+                <p class="card-text">   
+                """, unsafe_allow_html=True
+                )
+    else:
+        
+        # Count the frequency of each bin
+
+        individual_graph_rank_counts=pd.DataFrame([])
+        individual_graph_rank_counts['Rank'] = pd.cut(individual_graph['Rank'], bins=[0,3,5,10,1000],labels=['Top 3',' Top 5','Top 10','Above 10'])
+        individual_graph_rank_counts = individual_graph_rank_counts['Rank'].value_counts().reset_index()
+        individual_graph_rank_counts.columns = ['bin', 'count']
+        individual_graph_rank_counts_bar_graph=px.bar(individual_graph_rank_counts, y='bin', x='count', orientation='h',labels={'bin':'Bin', 'count':'Frequency'}, title='Frequency of Rank')
+        individual_graph_rank_counts_bar_graph.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
+        individual_graph_rank_counts_bar_graph.update_layout(
+        title="Frequency of Rank : {}".format(name),
+        xaxis_title="Count",
+        yaxis_title="Rank",
+        font=dict(
+            color="White"
+        ))
+        c1.plotly_chart(individual_graph_rank_counts_bar_graph, use_container_width=True)
+        
+        # Count the frequency of each bin
+
+        individual_graph_scatter=px.scatter(individual_graph, x='Date', y='Rank', color='Rank', color_continuous_scale='RdYlGn_r',color_continuous_midpoint=individual_graph['Rank'].max())  # This line sets the midpoint of the color scale to the maximum rank)
+        individual_graph_scatter.update_traces(marker=dict(size=12))  # This line sets the size of the markers to 12
+        individual_graph_scatter.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)','yaxis': {'autorange': "reversed"}})
+        individual_graph_scatter.update_layout(
+        title="Ranking".format(name),
+        xaxis_title="Date",
+        yaxis_title="Rank",
+        font=dict(
+            color="White"
+        ))
+        c2.plotly_chart(individual_graph_scatter, use_container_width=True)
+
+    individual_data_notion=processed_data[(processed_data['Discord Handle']==name) & (processed_data['Challenge_url']==processed_data['Bounty'])]
+
+with leader_board:
+    # st.write(Final_data.head())
+    leaderboard=Final_data.copy()
     
+    c1,c2=st.columns(2)
+    leaderboard_chain = c1.multiselect('Project', unique_program_names, default=default_value,key='leaderboard1')
 
-logger.debug('Converting data_with_rank list into DataFrame')  # Add a debugging statement
-# Convert the 'data_with_rank' list into a pandas DataFrame.
-Final_data=pd.DataFrame(data_with_rank)
-
-try:
-# Rename the columns of the DataFrame.
-    Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Score', 'Variance']
-except Exception as e:
-    logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
-    pass
-
-# Save the DataFrame to a CSV file.
-logger.debug('Saving DataFrame to CSV file: true_skill_sheet.csv')  # Add a debugging statement
-Final_data.to_csv('true_skill_sheet.csv')
-logger.info('Successfully saved DataFrame to CSV file: true_skill_sheet.csv')  # Add an info statement
-
-latest_score_csv = Final_data.sort_values('Date').groupby('Discord Handle',as_index=False)['Score'].last()
-latest_score_csv=pd.DataFrame(latest_score_csv)
-latest_score_csv.columns=['Discord Handle','Score']
-
-logger.debug('Saving DataFrame to CSV file: latest_score.csv')  # Add a debugging statement
-latest_score_csv.to_csv('latest_score.csv')
-logger.info('Successfully saved DataFrame to CSV file: latest_score.csv')  # Add an info statement
-
-individual_graph=Final_data[Final_data['Discord Handle']==name]
-st.write(individual_graph)
+    number_of_months=c2.select_slider("Number of Previous Months", options=[1,3,6,12,24],key='leaderboard2')
+    c2.write('You selected {} Months'.format(number_of_months))
 
 
-c1,c2=st.columns((40,60))
+    leaderboard_include_notion=c1.checkbox('Include notion',value=True,key='leaderboard3')
+    if leaderboard_chain[0]=='All':
+        Bounty_Program_Name=combined['Bounty Program Name'].unique()
 
+    else:
+        try:
+            leaderboard_chain.remove('All')
+        except:
+            pass
+        Bounty_Program_Name=leaderboard_chain
+    pattern = '|'.join(Bounty_Program_Name)
+    leaderboard = leaderboard[leaderboard['Project'].str.contains(pattern, na=False, case=False)]
+    latest_records = leaderboard.loc[leaderboard.groupby('Discord Handle')['Date'].idxmax()]
+    latest_records=latest_records[['Discord Handle','Address','Score']].sort_values(by='Score',ascending=False).head(10)
+    cols = latest_records.columns.tolist()  # get a list of the column names
+    cols = [cols[-1]] + cols[:-1]  # create a new list with the last column name at the start
 
-
-
-# Convert 'Date' column to datetime if it's not already
-individual_graph['Date'] = pd.to_datetime(individual_graph['Date'])
-
-# Sort data by date
-individual_graph = individual_graph.sort_values(by='Date')
-
-# Set 'Date' as index
-individual_graph.set_index('Date', inplace=True)
-
-# Smooth the 'Score' column with a rolling window operation (mean over window of size N)
-N = 4 # You can change the window size as needed
-individual_graph['Score_smooth'] = individual_graph['Score'].round(0).rolling(window=N).mean()
-
-# Reset the index
-individual_graph.reset_index(inplace=True)
-
-# Now plot the smoothed data
-individual_graph_smooth=px.line(individual_graph, x='Date', y='Score_smooth')
-individual_graph_smooth.update_yaxes(range=[0, 200])
-individual_graph_smooth.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
-individual_graph_smooth.update_layout(
-title="True Skill score of : {}".format(name),
-xaxis_title="Date",
-yaxis_title="Score",
-font=dict(
-    color="White"
-))
-c2.plotly_chart(individual_graph_smooth, use_container_width=True)
-
-
-
-try:
-
-    Latest_score = individual_graph['Score'].iloc[0]
-
-    fig = go.Figure(go.Indicator(
-        mode = "number+delta",
-        value = Latest_score,
-        number = {'prefix': " ", 'font': {'size': 24}},
-        delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
-        domain = {'x': [0, 1], 'y': [0, 1]}))
-
-
-    fig.update_layout({
-        # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
-        # 'paper_bgcolor': 'rgba(215,215,215,255)',
-        'height': 200, 
-        'width': 600,
-        'font': { 'size': 28}  
-    })
-
-    c1.plotly_chart(fig, use_container_width=True)
-
-
-except :
-    Latest_score = individual_graph['Score'].iloc[0]
-
-    fig = go.Figure(go.Indicator(
-        mode = "number",
-        value = Latest_score,
-        number = {'prefix': " ", 'font': {'size': 24}},
-        # delta = {'position': "top", 'reference': individual_graph['Score'].iloc[1], 'font': {'size': 24}},
-        domain = {'x': [0, 1], 'y': [0, 1]}))
-
-
-    fig.update_layout({
-        # 'plot_bgcolor': 'rgba(100, 0, 0, 0)',
-        # 'paper_bgcolor': 'rgba(215,215,215,255)',
-        'height': 200, 
-        'width': 600,
-        'font': { 'size': 28}  
-    })
-
-    c1.plotly_chart(fig, use_container_width=True)
-
+    latest_records = latest_records[cols] 
+    latest_records['Rank']=latest_records['Score'].rank(ascending=False,method='min')
+    st.dataframe(latest_records,use_container_width=True)
 
