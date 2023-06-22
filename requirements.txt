@@ -5,5 +5,3 @@ seaborn
 matplotlib
 plotly
 trueskill
-ast
-datetime
