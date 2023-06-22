@@ -5,3 +5,7 @@ seaborn
 matplotlib
 plotly
 trueskill
+logging
+itertools
+ast
+datetime
