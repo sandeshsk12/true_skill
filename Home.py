@@ -13,6 +13,8 @@ import logging # Import the logging library
 import plotly.graph_objects as go
 import ast
 from dateutil.relativedelta import relativedelta
+from pandas.api.types import CategoricalDtype
+from datetime import date
 
 #import streamlit.components.v1 as components
 st.set_page_config(page_title="Data Explorer", layout="wide",initial_sidebar_state="collapsed")
@@ -39,7 +41,7 @@ logging.basicConfig(
 st.markdown(f"""
 <div style='text-align: center'>
 <div class="card text-white bg-danger mb-3" >
-  <div class="card-header"> <h2> True-skill calculator </h2></div>    
+  <div class="card-header"> <h2> True-skill </h2></div>    
     <p class="card-text"></p>
   </div>
   </div>
@@ -160,34 +162,32 @@ unique_program_names = list(set(all_program_names))
 unique_program_names.append('All')
 
 
-analyst_profile,leader_board=st.tabs(['Analyst Profile','LeaderBoard'])
 
+
+c1,c2=st.columns(2)
+default_value = [unique_program_names[-1]]
+chain = c1.multiselect('Project', unique_program_names, default=default_value)
+include_notion=c1.checkbox('Include notion',value=True)
+
+number_of_months=c2.select_slider("Number of Previous Months", options=[0,1,3,6,12,24],value=3)
+all_time=c2.checkbox('All time',value=True)
+last_date=date.today()
+if all_time==True:
+    start_date=datetime.date(2022, 1, 1)
+elif number_of_months > 0:
+    start_date= last_date-relativedelta(months=number_of_months)
+else:
+    st.write('enter date correctly')
+
+# c2.write('You selected {} Months'.format(number_of_months))
+
+analyst_profile,leader_board,contact,credits=st.tabs(['Analyst Profile','LeaderBoard','Contact','Credits'])
 with analyst_profile: 
-    c1,c2,c3,c4 = st.columns(4)
 
+    c1,c2=st.columns(2)
     name=c1.selectbox('Discord Handle',processed_data['Discord Handle'].unique())
-    c1.write('OR')
-    address=c1.selectbox('Wallet Address',processed_data['xMetric Wallet'].unique())
-    default_value = [unique_program_names[-1]]
-    chain = c2.multiselect('Project', unique_program_names, default=default_value)
-
-
-
-
-    start_date=c3.date_input('Start Date',datetime.date(2022, 1, 1),min_value=datetime.date(2022, 1, 1))
-    last_date=c4.date_input('Last Date')
-
-    number_of_months=c3.select_slider("Number of Previous Months", options=[0,1,3,6,12,24])
-    c4.write('You selected {} Months'.format(number_of_months))
-
-
-    include_notion=c2.checkbox('Include notion',value=True)
-
-    if number_of_months > 0:
-        start_date= last_date-relativedelta(months=number_of_months)
-
-
-
+    
+    address=c2.selectbox('Wallet Address',processed_data['xMetric Wallet'].unique())
 
     st.markdown("---")
 
@@ -218,7 +218,7 @@ with analyst_profile:
 
 
     logger.info('Using time bounds') 
-    st.write(processed_data.head())
+    
     # Convert 'End Date' column to datetime
     processed_data['End Date'] = pd.to_datetime(processed_data['End Date'])
 
@@ -242,12 +242,15 @@ with analyst_profile:
     last_elo_score = pd.DataFrame(columns=['Discord Handle', 'mean', 'variance'])
     last_elo_score.to_csv('latest_elo_score.csv')
 
-    # Initialize a list for final output 
-    data_with_rank=[]
+    
 
 
     # Calculate ELO scores for each unique challenge url
     logger.info('Calculating ELO scores for each unique challenge url')  # Add a logging statement
+
+    # Initialize a list for final output 
+    data_with_rank=[]
+    
     for bounty in processed_data['Challenge_url'].unique():
             # Remainder of the code includes calculations for ELO score
             # Filter for unique challenge url
@@ -530,6 +533,7 @@ with analyst_profile:
     logger.info('Successfully saved DataFrame to CSV file: latest_score.csv')  # Add an info statement
 
     individual_graph=Final_data[Final_data['Discord Handle']==name]
+    
 
 
 
@@ -548,12 +552,12 @@ with analyst_profile:
     individual_graph.set_index('Date', inplace=True)
 
     # Smooth the 'Score' column with a rolling window operation (mean over window of size N)
-    N = 4 # You can change the window size as needed
+    N = 1 # You can change the window size as needed
     individual_graph['Score_smooth'] = individual_graph['Score'].round(0).rolling(window=N).mean()
 
     # Reset the index
     individual_graph.reset_index(inplace=True)
-
+    
 
     if individual_graph.shape[0]==0:
         c2.markdown( 
@@ -588,9 +592,15 @@ with analyst_profile:
 
 
         # Now plot the smoothed data
-        individual_graph_smooth=px.line(individual_graph, x='Date', y='Score_smooth')
+        individual_graph_smooth=px.line(
+                                        individual_graph, x='Date', y='Score_smooth',
+                                        hover_data=['Date','Score','Challenge','Rank']
+                                        )
+        
         individual_graph_smooth.update_yaxes(range=[Final_data['Score'].min(), Final_data['Score'].max()])
-        individual_graph_smooth.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
+        individual_graph_smooth.update_traces(mode='lines+markers',marker=dict(size=6))
+        # individual_graph_smooth.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25255)',})
+        
         individual_graph_smooth.update_layout(
         title="True Skill of : {}".format(name),
         xaxis_title="Date",
@@ -603,9 +613,9 @@ with analyst_profile:
         
 
 
-
+    individual_graph=individual_graph.sort_values(by='Date',ascending=False)
     try:
-
+        
         Latest_score = individual_graph['Score'].iloc[0]
 
         fig = go.Figure(go.Indicator(   
@@ -631,7 +641,10 @@ with analyst_profile:
 
     except :
         try: 
+            
             Latest_score = individual_graph['Score'].iloc[0]
+
+
 
             fig = go.Figure(go.Indicator(
                 mode = "number",
@@ -651,7 +664,7 @@ with analyst_profile:
             })
 
             c1.plotly_chart(fig, use_container_width=True)
-        except:
+        except Exception as e:
             c1.markdown( 
                 """
                 <div class="card text-white bg-secondary mb-" style="margin:1rem;" >
@@ -687,12 +700,19 @@ with analyst_profile:
         
         # Count the frequency of each bin
 
-        individual_graph_rank_counts=pd.DataFrame([])
-        individual_graph_rank_counts['Rank'] = pd.cut(individual_graph['Rank'], bins=[0,3,5,10,1000],labels=['Top 3',' Top 5','Top 10','Above 10'])
-        individual_graph_rank_counts = individual_graph_rank_counts['Rank'].value_counts().reset_index()
+        # Define the order of the categories
+        cat_type = CategoricalDtype(categories=['Above 10', 'Top 10', 'Top 5', 'Top 3'], ordered=True)
+
+        individual_graph_rank_counts = pd.DataFrame([])
+        individual_graph_rank_counts['Rank'] = pd.cut(individual_graph['Rank'], bins=[0,3,5,10,1000], labels=['Top 3', 'Top 5', 'Top 10', 'Above 10'])
+
+        # Convert the 'Rank' column to the categorical type with the specified order
+        individual_graph_rank_counts['Rank'] = individual_graph_rank_counts['Rank'].astype(cat_type)
+
+        individual_graph_rank_counts = individual_graph_rank_counts['Rank'].value_counts().sort_index().reset_index()
         individual_graph_rank_counts.columns = ['bin', 'count']
         individual_graph_rank_counts_bar_graph=px.bar(individual_graph_rank_counts, y='bin', x='count', orientation='h',labels={'bin':'Bin', 'count':'Frequency'}, title='Frequency of Rank')
-        individual_graph_rank_counts_bar_graph.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
+        # individual_graph_rank_counts_bar_graph.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)',})
         individual_graph_rank_counts_bar_graph.update_layout(
         title="Frequency of Rank : {}".format(name),
         xaxis_title="Count",
@@ -704,9 +724,14 @@ with analyst_profile:
         
         # Count the frequency of each bin
 
-        individual_graph_scatter=px.scatter(individual_graph, x='Date', y='Rank', color='Rank', color_continuous_scale='RdYlGn_r',color_continuous_midpoint=individual_graph['Rank'].max())  # This line sets the midpoint of the color scale to the maximum rank)
+        individual_graph_scatter=px.scatter(
+                                            individual_graph, x='Date', y='Rank', color='Rank', 
+                                            color_continuous_scale='RdYlGn_r',
+                                            color_continuous_midpoint=individual_graph['Rank'].max(),
+                                            hover_data=['Date','Score','Challenge','Rank']
+                                            )  # This line sets the midpoint of the color scale to the maximum rank)
         individual_graph_scatter.update_traces(marker=dict(size=12))  # This line sets the size of the markers to 12
-        individual_graph_scatter.update_layout({'plot_bgcolor': 'rgba(100, 0, 0, 0)','paper_bgcolor': 'rgba(25,25,25,255)','yaxis': {'autorange': "reversed"}})
+        individual_graph_scatter.update_layout({'yaxis': {'autorange': "reversed"}})
         individual_graph_scatter.update_layout(
         title="Ranking".format(name),
         xaxis_title="Date",
@@ -718,35 +743,86 @@ with analyst_profile:
 
     individual_data_notion=processed_data[(processed_data['Discord Handle']==name) & (processed_data['Challenge_url']==processed_data['Bounty'])]
 
-with leader_board:
-    # st.write(Final_data.head())
-    leaderboard=Final_data.copy()
-    
-    c1,c2=st.columns(2)
-    leaderboard_chain = c1.multiselect('Project', unique_program_names, default=default_value,key='leaderboard1')
-
-    number_of_months=c2.select_slider("Number of Previous Months", options=[1,3,6,12,24],key='leaderboard2')
-    c2.write('You selected {} Months'.format(number_of_months))
-
-
-    leaderboard_include_notion=c1.checkbox('Include notion',value=True,key='leaderboard3')
-    if leaderboard_chain[0]=='All':
-        Bounty_Program_Name=combined['Bounty Program Name'].unique()
-
+    black_marks = pd.read_csv('black_marks.csv')
+    black_marks=black_marks[['Discord Handle','Bounty','Public Result(s)','Created At','Notes']]
+    black_marks=black_marks[black_marks['Discord Handle']==name]
+    if black_marks.shape[0]==0:
+        pass 
     else:
-        try:
-            leaderboard_chain.remove('All')
-        except:
-            pass
-        Bounty_Program_Name=leaderboard_chain
-    pattern = '|'.join(Bounty_Program_Name)
-    leaderboard = leaderboard[leaderboard['Project'].str.contains(pattern, na=False, case=False)]
-    latest_records = leaderboard.loc[leaderboard.groupby('Discord Handle')['Date'].idxmax()]
-    latest_records=latest_records[['Discord Handle','Address','Score']].sort_values(by='Score',ascending=False).head(10)
-    cols = latest_records.columns.tolist()  # get a list of the column names
-    cols = [cols[-1]] + cols[:-1]  # create a new list with the last column name at the start
+        st.header('Black marks')
 
-    latest_records = latest_records[cols] 
-    latest_records['Rank']=latest_records['Score'].rank(ascending=False,method='min')
-    st.dataframe(latest_records,use_container_width=True)
+        st.dataframe(black_marks)
+    
+    try:
+        st.header('Network')
+
+        badges=pd.read_json('https://api.flipsidecrypto.com/api/v2/queries/6f2f3f93-2dff-4c27-a5e4-e840cf2d950d/data/latest')
+        mint=badges[badges['EVENT_TYPE']=='mint']
+        others=badges[badges['EVENT_TYPE']!='mint']
+        mint['concat']=mint['NFT_TO_ADDRESS']+mint['NFT_ADDRESS']+(mint['TOKENID'].apply(lambda x: str(x)))+(mint['ERC1155_VALUE'].apply(lambda x: str(x)))
+        others['concat']=others['NFT_FROM_ADDRESS']+others['NFT_ADDRESS']+(others['TOKENID'].apply(lambda x: str(x)))+(others['ERC1155_VALUE'].apply(lambda x: str(x)))
+        holders=mint[~mint['concat'].isin(others['concat'])]
+        analyst_address=discord_handles[discord_handles['Discord Handle']==name]['xMetric Wallet']
+        # Define your mapping dictionary
+        mapping_dict = {
+            '0xa331500a57c7aaa9c5912d2415f44b399d1c6bc3': 'Seleçao',
+            '0xe76645b8b79f2d9147219fa655a4fa96b9f08ffc': 'Eager Beavers',
+            '0xc97bec159db7fc28b492c95a4dfd9f2d150d8744': 'Samurai',
+            '0x83c923ed97a14271610b8125317a85f469a18662':'Pine',
+            '0xd21c9f8b60a94d60ceb305a883e479ec14590970':'Solar Core',
+            '0xaee9f539fbae23fa4d11641f39d5e9293e8aecd7':'The Watchmen',
+            '0x1804537ec4647be7af16b4a4ec63c3e517a2ee6b': 'Lamoka'
+            # Add more mappings as needed
+        }
+
+        # Create a new column by mapping the values of 'column_to_map'
+        holders['network'] = holders['NFT_ADDRESS'].map(mapping_dict)
+        networks_part_of=(holders[holders['NFT_TO_ADDRESS']==analyst_address.values[0]]['network'].unique())
+        st.dataframe(networks_part_of,use_container_width=True)
+    except:
+        pass
+with leader_board:
+    
+
+    # Assuming df is your DataFrame, 'name' is your name column, and 'date' is your date column
+
+
+    # Get the latest record for each name
+    latest_records = Final_data.loc[Final_data.groupby('Discord Handle')['Date'].idxmax()]
+
+    
+    latest_records=(latest_records.sort_values(by='Score',ascending=False).head(10))
+    latest_records['Rank']=latest_records['Score'].rank(ascending=False)
+    latest_records=latest_records[['Rank','Discord Handle','Address','Date','Score']]
+    latest_records.columns=['Rank','Discord Handle','Address','Last active on','Score']
+
+    leaderboard_fig=px.bar(latest_records.sort_values(by='Score',ascending=True),x='Score',y='Discord Handle',orientation='h',
+                           title='Leaderboard',color='Score',color_continuous_scale='YlGn_r')
+
+    st.plotly_chart(leaderboard_fig,use_container_width=True)
+
+
+    st.dataframe(latest_records,use_container_width=True,hide_index=True)
+with contact: 
+    st.header("Contact info")
+    st.write(f"""
+            Discord : sandesh8645 \n
+            Twitter : https://twitter.com/Sandesh_K_12 \n
+            Github  : https://github.com/sandeshsk12/true_skill
+            """)
+with credits:
+    st.header("Acknowledgements")
+
+    st.write(f"""
+            Shoutout to Neby (aka. Not [moisturized] smol data) for his excellent work! Acknowledging the contributions of individuals like Neby is important as it encourages a collaborative and supportive environment. So, thank you, Neby, for your valuable contributions and for making a positive impact!
+            
+            Checkout his dashboard and smash some like buttons at https://flipsidecrypto.xyz/LittlerData/metrics-dao-analytics-marketplace-through-the-magnifier-1A7FAJ """
+            )
+    st.write(f"""
+             Resources : \n
+             1. True skill package : https://trueskill.org/ \n 
+             2. True skill theory : https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/
+             """)
+
+
 
