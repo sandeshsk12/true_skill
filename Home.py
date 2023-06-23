@@ -255,6 +255,8 @@ with analyst_profile:
     st.write(processed_data_temp.dtypes)
     st.dataframe(processed_data_temp[processed_data_temp['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
     processed_data_temp['End Date'] = processed_data_temp['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
+    processed_data_temp['End Date']=pd.to_datetime(processed_data_temp['End Date'])
+    
     st.dataframe(processed_data_temp[processed_data_temp['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
     st.write(processed_data_temp.dtypes)
     
