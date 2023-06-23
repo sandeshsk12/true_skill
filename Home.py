@@ -254,6 +254,7 @@ with analyst_profile:
     st.dataframe(processed_data_temp[processed_data_temp['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
     processed_data_temp['End Date'] = processed_data_temp['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
     st.dataframe(processed_data_temp[processed_data_temp['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
+    st.write(processed_data_temp.dtypes)
     
     for bounty in processed_data['Challenge_url'].unique():
             # Remainder of the code includes calculations for ELO score
