@@ -516,8 +516,8 @@ with analyst_profile:
     try:
     # Rename the columns of the DataFrame.
         Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Rank','Number of Submissions','Score', 'Variance']
-        # Final_data['Date'] = pd.to_datetime(Final_data['Date']) 
-        # Final_data['Date'] = Final_data['Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
+        Final_data['Date'] = pd.to_datetime(Final_data['Date']) 
+        Final_data['Date'] = Final_data['Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
         Final_data['Date'] = pd.to_datetime(Final_data['Date'],format="%d-%m-%Y %H:%M:%S")
         st.write(Final_data.dtypes)
         st.dataframe(Final_data[Final_data['Discord Handle']=='sandesh#8645'].sort_values(by='Date',ascending=True))
