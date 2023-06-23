@@ -3807,3 +3807,139 @@
 2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index.lock", inode=7719399, flags=10100, id=94758662): is_created, is_file
 2023-06-23 13:47:04 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', is_directory=False>
 2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/d3/9e27741fc50f716f6718cb65d71b0912e83909", inode=7719401, flags=110100, id=94758687): is_created, is_file, is_hardlink
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/d3", inode=7718610, flags=20400, id=94758690): is_directory, is_inode_meta_mod
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/d3/tmp_obj_D6Q2ha", inode=7719401, flags=111300, id=94758693): is_coalesced, is_created, is_file, is_hardlink, is_modified, is_removed
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/pack/pack-75eb742fef44b3ada137f0d20c07ef5dd891793e.pack", inode=7264680, flags=10400, id=94758696): is_file, is_inode_meta_mod
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/4a/4edcb1e5862dab7a52d05c3f4561fc0874bbcf", inode=7713825, flags=110400, id=94758699): is_file, is_hardlink, is_inode_meta_mod
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/f1/f47f9df9b4f5698f2b2deab7bbb0c5adb92cd1", inode=7719405, flags=110100, id=94758711): is_created, is_file, is_hardlink
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/f1", inode=7719404, flags=20500, id=94758714): is_created, is_directory, is_inode_meta_mod
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/f1/tmp_obj_GxVcUR", inode=7719405, flags=111300, id=94758717): is_coalesced, is_created, is_file, is_hardlink, is_modified, is_removed
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/a1/9ca86e1904249672d122114c240299ed2096a2", inode=7713832, flags=110400, id=94758720): is_file, is_hardlink, is_inode_meta_mod
+2023-06-23 13:47:04 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/d3/9e27741fc50f716f6718cb65d71b0912e83909', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/d3', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/d3', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/d3/tmp_obj_D6Q2ha', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/d3/tmp_obj_D6Q2ha', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/d3', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/pack/pack-75eb742fef44b3ada137f0d20c07ef5dd891793e.pack', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/4a/4edcb1e5862dab7a52d05c3f4561fc0874bbcf', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1/f47f9df9b4f5698f2b2deab7bbb0c5adb92cd1', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <DirCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1/tmp_obj_GxVcUR', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1/tmp_obj_GxVcUR', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/f1', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/a1/9ca86e1904249672d122114c240299ed2096a2', is_directory=False>
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index.lock", inode=7719399, flags=11900, id=94758726): is_coalesced, is_created, is_file, is_modified, is_renamed
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index", inode=7719399, flags=10800, id=94758727): is_file, is_renamed
+2023-06-23 13:47:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index", inode=7718609, flags=10800, id=94758728): is_file, is_renamed
+2023-06-23 13:47:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', is_directory=False>
+2023-06-23 13:47:04 DEBUG    Destination event for rename is NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index", inode=7719399, flags=10800, id=94758727)
+2023-06-23 13:47:04 DEBUG    queue_event <FileMovedEvent: src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', dest_path='/Users/sandesh/data_science/true_skill/.git/index', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:04 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/index', is_directory=False>
+2023-06-23 13:47:04 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index.lock", inode=7719411, flags=10100, id=94758767): is_created, is_file
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/b6/d6161c58a6947a51644a316f260e067b297668", inode=7719412, flags=110100, id=94758776): is_created, is_file, is_hardlink
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/b6", inode=7667240, flags=20400, id=94758779): is_directory, is_inode_meta_mod
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/b6/tmp_obj_ds5gR9", inode=7719412, flags=111300, id=94758782): is_coalesced, is_created, is_file, is_hardlink, is_modified, is_removed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/c2/e787c5d3c468eff8b49152d54ede8d9d33f6bb", inode=7719416, flags=110100, id=94758794): is_created, is_file, is_hardlink
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/c2", inode=7719415, flags=20500, id=94758797): is_created, is_directory, is_inode_meta_mod
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/c2/tmp_obj_uJhyN3", inode=7719416, flags=111300, id=94758800): is_coalesced, is_created, is_file, is_hardlink, is_modified, is_removed
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/b6/d6161c58a6947a51644a316f260e067b297668', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/b6', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/b6', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/b6/tmp_obj_ds5gR9', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/b6/tmp_obj_ds5gR9', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/b6', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2/e787c5d3c468eff8b49152d54ede8d9d33f6bb', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2/tmp_obj_uJhyN3', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2/tmp_obj_uJhyN3', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/c2', is_directory=True>
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index.lock", inode=7719411, flags=11900, id=94758806): is_coalesced, is_created, is_file, is_modified, is_renamed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index", inode=7719411, flags=10800, id=94758807): is_file, is_renamed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index", inode=7719399, flags=10800, id=94758808): is_file, is_renamed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/COMMIT_EDITMSG", inode=6988507, flags=11400, id=94758814): is_file, is_inode_meta_mod, is_modified
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/76/d0101bb09bf3e570dd0e437878aa2e3a4c6c0f", inode=7719420, flags=110100, id=94758826): is_created, is_file, is_hardlink
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/76", inode=7719419, flags=20500, id=94758829): is_created, is_directory, is_inode_meta_mod
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/76/tmp_obj_djhV5h", inode=7719420, flags=111300, id=94758832): is_coalesced, is_created, is_file, is_hardlink, is_modified, is_removed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/logs/HEAD", inode=7264666, flags=11000, id=94758844): is_file, is_modified
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/logs/refs/heads/master", inode=7264668, flags=11000, id=94758847): is_file, is_modified
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/heads/master.lock", inode=7719424, flags=11900, id=94758850): is_coalesced, is_created, is_file, is_modified, is_renamed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/heads/master", inode=7719424, flags=10800, id=94758851): is_file, is_renamed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/heads/master", inode=7718622, flags=10800, id=94758852): is_file, is_renamed
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/HEAD.lock", inode=7719423, flags=10300, id=94758855): is_coalesced, is_created, is_file, is_removed
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    Destination event for rename is NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index", inode=7719411, flags=10800, id=94758807)
+2023-06-23 13:47:05 DEBUG    queue_event <FileMovedEvent: src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', dest_path='/Users/sandesh/data_science/true_skill/.git/index', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/index', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/COMMIT_EDITMSG', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76/d0101bb09bf3e570dd0e437878aa2e3a4c6c0f', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76/tmp_obj_djhV5h', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76/tmp_obj_djhV5h', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects/76', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/logs/HEAD', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/logs/refs/heads/master', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads/master.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads/master.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    Destination event for rename is NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/heads/master", inode=7719424, flags=10800, id=94758851)
+2023-06-23 13:47:05 DEBUG    queue_event <FileMovedEvent: src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads/master.lock', dest_path='/Users/sandesh/data_science/true_skill/.git/refs/heads/master', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads/master', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/heads', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/HEAD.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/HEAD.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
+2023-06-23 13:47:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/maintenance.lock", inode=7719425, flags=10300, id=94758861): is_coalesced, is_created, is_file, is_removed
+2023-06-23 13:47:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/maintenance.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:47:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/maintenance.lock', is_directory=False>
+2023-06-23 13:47:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:47:08 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/logs/refs/remotes/origin/master", inode=7264670, flags=11000, id=94759026): is_file, is_modified
+2023-06-23 13:47:08 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master.lock", inode=7719436, flags=11900, id=94759029): is_coalesced, is_created, is_file, is_modified, is_renamed
+2023-06-23 13:47:08 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master", inode=7719436, flags=10800, id=94759030): is_file, is_renamed
+2023-06-23 13:47:08 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master", inode=7718634, flags=10800, id=94759031): is_file, is_renamed
+2023-06-23 13:47:08 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/logs/refs/remotes/origin/master', is_directory=False>
+2023-06-23 13:47:08 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master.lock', is_directory=False>
+2023-06-23 13:47:08 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin', is_directory=True>
+2023-06-23 13:47:08 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master.lock', is_directory=False>
+2023-06-23 13:47:08 DEBUG    Destination event for rename is NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master", inode=7719436, flags=10800, id=94759030)
+2023-06-23 13:47:08 DEBUG    queue_event <FileMovedEvent: src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master.lock', dest_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master', is_directory=False>
+2023-06-23 13:47:08 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin', is_directory=True>
+2023-06-23 13:47:08 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin', is_directory=True>
+2023-06-23 13:47:08 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin/master', is_directory=False>
+2023-06-23 13:47:08 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/refs/remotes/origin', is_directory=True>
+2023-06-23 13:48:04 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/FETCH_HEAD", inode=6988565, flags=10400, id=94761607): is_file, is_inode_meta_mod
+2023-06-23 13:48:04 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/FETCH_HEAD', is_directory=False>
+2023-06-23 13:48:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/FETCH_HEAD", inode=6988565, flags=11400, id=94761616): is_file, is_inode_meta_mod, is_modified
+2023-06-23 13:48:05 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/objects/maintenance.lock", inode=7719577, flags=10300, id=94761622): is_coalesced, is_created, is_file, is_removed
+2023-06-23 13:48:05 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/FETCH_HEAD', is_directory=False>
+2023-06-23 13:48:05 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/objects/maintenance.lock', is_directory=False>
+2023-06-23 13:48:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:48:05 DEBUG    queue_event <FileDeletedEvent: event_type=deleted, src_path='/Users/sandesh/data_science/true_skill/.git/objects/maintenance.lock', is_directory=False>
+2023-06-23 13:48:05 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git/objects', is_directory=True>
+2023-06-23 13:48:21 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/Home.py", inode=6995640, flags=11400, id=94762326): is_file, is_inode_meta_mod, is_modified
+2023-06-23 13:48:21 DEBUG    queue_event <FileModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/Home.py', is_directory=False>
+2023-06-23 13:48:31 DEBUG    NativeEvent(path="/Users/sandesh/data_science/true_skill/.git/index.lock", inode=7719635, flags=10100, id=94762627): is_created, is_file
+2023-06-23 13:48:31 DEBUG    queue_event <FileCreatedEvent: event_type=created, src_path='/Users/sandesh/data_science/true_skill/.git/index.lock', is_directory=False>
+2023-06-23 13:48:31 DEBUG    queue_event <DirModifiedEvent: event_type=modified, src_path='/Users/sandesh/data_science/true_skill/.git', is_directory=True>
