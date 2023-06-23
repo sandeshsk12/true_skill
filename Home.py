@@ -517,10 +517,11 @@ with analyst_profile:
     # Rename the columns of the DataFrame.
         Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Rank','Number of Submissions','Score', 'Variance']
         Final_data['Date'] = pd.to_datetime(Final_data['Date'],dayfirst=True) 
-        Final_data['Date'] = Final_data['Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
+        Final_data['Date'] = Final_data['Date'].dt.strftime("%Y-%m-%d %H:%M:%S")
         # Final_data['Date_str'] = pd.to_datetime(Final_data['Date_str'],format="%d-%m-%Y %H:%M:%S",dayfirst=True) 
         st.dataframe(Final_data[Final_data['Discord Handle']=='sandesh#8645'].sort_values(by='Date',ascending=True))
         # Final_data['Date']=Final_data['Date_str']
+
     except Exception as e:
         logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
         st.write(e)
