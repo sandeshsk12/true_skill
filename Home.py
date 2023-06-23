@@ -72,7 +72,7 @@ overall_submissions=overall_submissions.merge(bounty_details,left_on='Bounty',ri
 
 logger.info('Converting date format and sorting the dataframe') # Add a logging statement
 # Convert the 'End Date' column to datetime format and sort the dataframe by it
-# overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
+overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
 overall_submissions['End Date'] = overall_submissions['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
 overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
 overall_submissions=overall_submissions.sort_values(by='End Date',ascending=True)
