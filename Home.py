@@ -67,6 +67,8 @@ bounty_details=pd.read_csv('Bounty-main.csv')
 logger.info('Merging CSV files') # Add a logging statement
 # Merge the CSV files based on the 'Bounty' column
 overall_submissions=overall_submissions.merge(bounty_details,left_on='Bounty',right_on='Name')
+st.dataframe(overall_submissions[overall_submissions['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
+
 
 logger.info('Converting date format and sorting the dataframe') # Add a logging statement
 # Convert the 'End Date' column to datetime format and sort the dataframe by it
