@@ -250,6 +250,7 @@ with analyst_profile:
 
     # Initialize a list for final output 
     data_with_rank=[]
+    st.dataframe(processed_data[processed_data['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
     
     for bounty in processed_data['Challenge_url'].unique():
             # Remainder of the code includes calculations for ELO score
