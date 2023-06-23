@@ -518,7 +518,7 @@ with analyst_profile:
         Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Rank','Number of Submissions','Score', 'Variance']
         Final_data['Date'] = pd.to_datetime(Final_data['Date']) 
         Final_data['Date_str'] = Final_data['Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
-        Final_data['Date_str'] = pd.to_datetime(Final_data['Date_str'],format="%d-%m-%Y %H:%M:%S") 
+        Final_data['Date_str'] = pd.to_datetime(Final_data['Date_str'],format="%d-%m-%Y %H:%M:%S",dayfirst=True) 
         st.dataframe(Final_data[Final_data['Discord Handle']=='sandesh#8645'].sort_values(by='Date_str',ascending=True))
         Final_data['Date']=Final_data['Date_str']
     except Exception as e:
