@@ -73,11 +73,10 @@ overall_submissions=overall_submissions.merge(bounty_details,left_on='Bounty',ri
 logger.info('Converting date format and sorting the dataframe') # Add a logging statement
 # Convert the 'End Date' column to datetime format and sort the dataframe by it
 overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'],dayfirst=True)
-st.dataframe(overall_submissions[overall_submissions['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
 overall_submissions['End Date'] = overall_submissions['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
 overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
 overall_submissions=overall_submissions.sort_values(by='End Date',ascending=True)
-st.dataframe(overall_submissions[overall_submissions['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
+
 
 logger.info('Converting wallet columns to lowercase') # Add a logging statement
 # Convert 'MetaMask Wallet' and 'xMetric Wallet' columns to lowercase
@@ -254,7 +253,7 @@ with analyst_profile:
 
     # Initialize a list for final output 
     data_with_rank=[]
-    st.dataframe(processed_data[processed_data['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
+    
 
     
     for bounty in processed_data['Challenge_url'].unique():
@@ -521,11 +520,7 @@ with analyst_profile:
     try:
     # Rename the columns of the DataFrame.
         Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Rank','Number of Submissions','Score', 'Variance']
-        Final_data['Date'] = pd.to_datetime(Final_data['Date'],dayfirst=True) 
-        Final_data['Date'] = Final_data['Date'].dt.strftime("%Y-%m-%d %H:%M:%S")
-        # Final_data['Date_str'] = pd.to_datetime(Final_data['Date_str'],format="%d-%m-%Y %H:%M:%S",dayfirst=True) 
-        st.dataframe(Final_data[Final_data['Discord Handle']=='sandesh#8645'].sort_values(by='Date',ascending=True))
-        # Final_data['Date']=Final_data['Date_str']
+
 
     except Exception as e:
         logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
