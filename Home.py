@@ -519,6 +519,7 @@ with analyst_profile:
         # Final_data['Date'] = pd.to_datetime(Final_data['Date']) 
         # Final_data['Date'] = Final_data['Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
         Final_data['Date'] = pd.to_datetime(Final_data['Date'],format="%d-%m-%Y %H:%M:%S")
+        st.write(Final_data.dtypes)
         st.write(Final_data[Final_data['Discord Handle']=='sandesh#8645'].sort_values(by='Date',ascending=True))
     except Exception as e:
         logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
