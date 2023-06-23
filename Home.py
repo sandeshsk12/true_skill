@@ -250,20 +250,7 @@ with analyst_profile:
 
     # Initialize a list for final output 
     data_with_rank=[]
-    processed_data_temp=processed_data.copy()
-    processed_data_temp['End Date']=pd.to_datetime(processed_data_temp['End Date'])
-    processed_data_temp['End Date'] = processed_data_temp['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
-    processed_data_temp['End Date']=pd.to_datetime(processed_data_temp['End Date'])
-    # st.write(processed_data_temp.dtypes)
-    # st.dataframe(processed_data_temp[processed_data_temp['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
-    # processed_data_temp['End Date'] = processed_data_temp['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
-    # processed_data_temp['End Date']=pd.to_datetime(processed_data_temp['End Date'])
 
-    # processed_data=processed_data_temp.copy
-    st.dataframe(processed_data_temp[processed_data_temp['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
-    st.write(processed_data_temp.dtypes)
-    processed_data=processed_data_temp.copy()
-    st.write(processed_data.dtypes)
     
     for bounty in processed_data['Challenge_url'].unique():
             # Remainder of the code includes calculations for ELO score
@@ -529,6 +516,9 @@ with analyst_profile:
     try:
     # Rename the columns of the DataFrame.
         Final_data.columns=['Discord Handle', 'Address', 'Dashboard link', 'Project', 'Challenge', 'Challenge_link', 'Date', 'Rank','Number of Submissions','Score', 'Variance']
+        Final_data['Date'] = pd.to_datetime(Final_data['Date'])
+        Final_data['Date'] = Final_data['Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
+        Final_data['Date'] = pd.to_datetime(Final_data['Date'])
     except Exception as e:
         logger.error('Error renaming DataFrame columns. Error: %s', e)  # Add an error statement
         pass
