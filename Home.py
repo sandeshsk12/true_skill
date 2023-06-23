@@ -93,7 +93,7 @@ logger.info('Creating a new dataframe for discord handles and sorting by Created
 # Create a new dataframe for discord handles and sort by 'Created At'
 discord_handles=overall_submissions[['Discord Handle','xMetric Wallet','Created At']]
 discord_handles['Created At'] = pd.to_datetime(discord_handles['Created At'], format="%d/%m/%Y %H:%M")
-discord_handles['Created At'] = discord_handles['Created At'].dt.strftime("%Y-%m-%d %H:%M:%S")
+discord_handles['Created At'] = discord_handles['Created At'].dt.strftime("%d-%m-%Y %H:%M:%S")
 discord_handles=discord_handles.sort_values(by='Created At',ascending=True)
 discord_handles.dropna(inplace=True)
 discord_handles.drop_duplicates(subset='xMetric Wallet',keep='last',inplace=True)
