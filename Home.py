@@ -67,15 +67,16 @@ bounty_details=pd.read_csv('Bounty-main.csv')
 logger.info('Merging CSV files') # Add a logging statement
 # Merge the CSV files based on the 'Bounty' column
 overall_submissions=overall_submissions.merge(bounty_details,left_on='Bounty',right_on='Name')
-st.dataframe(overall_submissions[overall_submissions['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
+
 
 
 logger.info('Converting date format and sorting the dataframe') # Add a logging statement
 # Convert the 'End Date' column to datetime format and sort the dataframe by it
 overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
-overall_submissions['End Date'] = overall_submissions['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
-overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
+# overall_submissions['End Date'] = overall_submissions['End Date'].dt.strftime("%d-%m-%Y %H:%M:%S")
+# overall_submissions['End Date']=pd.to_datetime(overall_submissions['End Date'])
 overall_submissions=overall_submissions.sort_values(by='End Date',ascending=True)
+st.dataframe(overall_submissions[overall_submissions['Discord Handle']=='sandesh#8645'].sort_values(by='End Date',ascending=True))
 
 logger.info('Converting wallet columns to lowercase') # Add a logging statement
 # Convert 'MetaMask Wallet' and 'xMetric Wallet' columns to lowercase
